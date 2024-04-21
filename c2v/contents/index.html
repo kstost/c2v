@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Rectangle</title>
+    <script src="../lib/lib.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: red;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #square {
+            width: 100px;
+            height: 100px;
+            background-color: blue;
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="square"></div>
+
+    <script>
+
+        function main() {
+            setInterval(async () => {
+                await playAudio('_vong.mp3')
+            }, 1000);
+
+            document.getElementById('square').style.display = 'block';
+            setTimeout(recordingEnd, 10000);
+
+        }
+    </script>
+</body>
+
+</html>
