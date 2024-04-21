@@ -34,8 +34,29 @@ curl -fsSL https://deb.nodesource.com/setup_21.x | sudo -E bash -  && sudo DEBIA
 sudo DEBIAN_FRONTEND=noninteractive apt install chromium-browser ffmpeg xvfb pulseaudio alsa-utils -yq
 
 # 환경설정 (주로 AWS) - echo $SHELL; 명령어 수행결과 bash라고 표시될때 수행
-echo "export PUPPETEER_EXECUTABLE_PATH=$(which chromium)" >> ~/.bashrc && source ~/.bashrc
-echo "pulseaudio --start" >> ~/.bashrc && source ~/.bashrc
+case "$SHELL" in
+  */zsh)
+    echo "export PUPPETEER_EXECUTABLE_PATH=$(which chromium)" >> ~/.zshrc && source ~/.zshrc
+    ;;
+  */bash)
+    echo "export PUPPETEER_EXECUTABLE_PATH=$(which chromium)" >> $(if [ -f ~/.bash_profile ]; then echo ~/.bash_profile; else echo ~/.bashrc; fi) && source $(if [ -f ~/.bash_profile ]; then echo ~/.bash_profile; else echo ~/.bashrc; fi)
+    ;;
+  *)
+    echo "not support"
+    ;;
+esac
+case "$SHELL" in
+  */zsh)
+    echo "pulseaudio --start" >> ~/.zshrc && source ~/.zshrc
+    ;;
+  */bash)
+    echo "pulseaudio --start" >> $(if [ -f ~/.bash_profile ]; then echo ~/.bash_profile; else echo ~/.bashrc; fi) && source $(if [ -f ~/.bash_profile ]; then echo ~/.bash_profile; else echo ~/.bashrc; fi)
+    ;;
+  *)
+    echo "not support"
+    ;;
+esac
+
 
 # 환경설정 - echo $SHELL; 명령어 수행결과 zsh라고 표시될때 수행
 # echo "export PUPPETEER_EXECUTABLE_PATH=$(which chromium)" >> ~/.zshrc && source ~/.zshrc
