@@ -48,3 +48,6 @@ echo "pulseaudio --start" >> ~/.bashrc && source ~/.bashrc
 
 # 실행
 # cd ~/canaanProject/shorts_maker && node index.js example/index.html output.mp4
+
+cd ~ && git clone https://github.com/kstost/c2v
+cd c2v/c2v/ && npm i
