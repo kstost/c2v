@@ -39,27 +39,21 @@ async function loadManifest(sourcePath) {
     let resolution = manifest.screen_size;
     resolution.width = Math.round(resolution.width * manifest.screen_scale);
     resolution.height = Math.round(resolution.height * manifest.screen_scale);
-    const display = await findAvailableDisplay();
-    const displayArgument = display + ".0";
-    const xvfb = spawn('Xvfb', [display, '-screen', '0', `${resolution.width}x${resolution.height}x24`]);
-    if (false) console.log(`Display set to: ${displayArgument}`);
-    if (false) console.log(`Xvfb started on display ${display}`);
-
-    const browser = await puppeteer.launch({
-        headless: false,
-        ignoreDefaultArgs: ['--enable-automation'],
-        args: ['--no-sandbox', '--disable-setuid-sandbox', `--display=${display}`, '--window-size=' + `${resolution.width},${resolution.height}`,
-            '--autoplay-policy=no-user-gesture-required',
-        ],
-        defaultViewport: resolution
-    });
-
-
-    const page = await browser.newPage();
-    await page.goto(`file://${sourcePath}/${manifest.main}#puppeteer`);
-
     let loop = merge ? 2 : 1;
     for (let i = 0; i < loop; i++) {
+        const display = await findAvailableDisplay();
+        const displayArgument = display + ".0";
+        const xvfb = spawn('Xvfb', [display, '-screen', '0', `${resolution.width}x${resolution.height}x24`]);
+        const browser = await puppeteer.launch({
+            headless: false,
+            ignoreDefaultArgs: ['--enable-automation'],
+            args: ['--no-sandbox', '--disable-setuid-sandbox', `--display=${display}`, '--window-size=' + `${resolution.width},${resolution.height}`,
+                '--autoplay-policy=no-user-gesture-required',
+            ],
+            defaultViewport: resolution
+        });
+        const page = await browser.newPage();
+        await page.goto(`file://${sourcePath}/${manifest.main}#puppeteer`);
         let firstWithAudio = i === 0;
         await page.waitForFunction(() => document.readyState === 'complete', { polling: 'raf' });
         await page.evaluate(() => {
@@ -101,9 +95,9 @@ async function loadManifest(sourcePath) {
         await page.waitForFunction(() => window.doned === true, { polling: 'raf' });
         if (merge) {
             ffmpeg.on('close', async (code) => {
+                await browser.close();
+                xvfb.kill();
                 if (!firstWithAudio) {
-                    await browser.close();
-                    xvfb.kill();
                     fs.renameSync(outputPath, `${outputPath}_video`);
                     const ffmpeg = spawn('ffmpeg', [
                         '-i', `${outputPath}_video`, // 비디오 파일(소리 없음) 입력
@@ -122,7 +116,6 @@ async function loadManifest(sourcePath) {
                     });
                 } else {
                     fs.copyFileSync(outputPath, `${outputPath}_audio`);
-                    page.reload()
                 }
             });
             ffmpeg.kill('SIGINT')
