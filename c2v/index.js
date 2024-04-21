@@ -6,7 +6,7 @@ async function findAvailableDisplay() {
     return new Promise((resolve, reject) => {
         exec("ps ax | grep Xvfb | grep -v grep", (err, stdout, stderr) => {
             if (err) {
-                console.log("No Xvfb process found, using default :99");
+                if (false) console.log("No Xvfb process found, using default :99");
                 resolve(":99");
             } else {
                 const usedDisplays = new Set();
