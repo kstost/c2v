@@ -1,0 +1,9 @@
+{
+    "main": "index.html",
+    "screen_size": {
+        "width": 1920,
+        "height": 1080
+    },
+    "screen_scale": 1,
+    "merge": true
+}
