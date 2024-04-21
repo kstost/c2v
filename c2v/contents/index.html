@@ -42,8 +42,15 @@
     <script>
 
         function main() {
+            let toggle = false;
             setInterval(async () => {
-                await playAudio('_vong.mp3')
+                playAudio('_vong.mp3')
+                toggle = !toggle;
+                if (toggle) {
+                    document.getElementById('square').style.display = 'red';
+                } else {
+                    document.getElementById('square').style.display = 'blue';
+                }
             }, 1000);
 
             document.getElementById('square').style.display = 'block';
