@@ -5,5 +5,5 @@
         "height": 1080
     },
     "screen_scale": 0.5,
-    "merge": true
+    "merge": false
 }
