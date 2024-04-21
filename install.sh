@@ -52,3 +52,4 @@ echo "pulseaudio --start" >> ~/.bashrc && source ~/.bashrc
 cd ~ && git clone https://github.com/kstost/c2v
 cd c2v/c2v/ && npm i
 echo "C2V is installed at `pwd`"
+echo "node index.js ./contents/ ./output.mp4"
