@@ -25,8 +25,7 @@ async function findAvailableDisplay() {
         });
     });
 }
-async function loadManifest() {
-    const sourcePath = path.resolve(process.argv[2]);
+async function loadManifest(sourcePath) {
     let manifest = fs.readFileSync(sourcePath + '/manifest.json', 'utf8');
     try {
         return JSON.parse(manifest);
@@ -34,7 +33,8 @@ async function loadManifest() {
     return;
 }
 (async () => {
-    const manifest = await loadManifest();
+    const sourcePath = path.resolve(process.argv[2]);
+    const manifest = await loadManifest(sourcePath);
     let merge = manifest.merge;
     let resolution = manifest.screen_size;
     resolution.width = Math.round(resolution.width * manifest.screen_scale);
