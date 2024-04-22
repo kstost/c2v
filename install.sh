@@ -71,6 +71,7 @@ esac
 # cd ~/canaanProject/shorts_maker && node index.js example/index.html output.mp4
 
 cd ~ && git clone https://github.com/kstost/c2v
-cd c2v/c2v/ && npm i
+mv c2v canaanProject
+cd canaanProject/c2v/ && npm i
 echo "C2V is installed at `pwd`"
 echo "node index.js ./contents/ ./output.mp4"
