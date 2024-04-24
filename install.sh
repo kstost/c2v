@@ -1,9 +1,11 @@
-# shorts_maker 소개
-# HTML, CSS, Javascript로 틱톡 유튜브등의 숏츠를 만드는 방법이다
+# C2V 소개
+# 코드 기반으로 틱톡, 유튜브등을 위한 영상을 보다 편리하게 만들 수 있도록 도와줍니다.
 
-# shorts_maker 사용방법
-# shorts_maker는 리눅스(Ubuntu) 컴퓨터를 기반으로 작동한다
-# 따라서 리눅스(Ubuntu) 컴퓨터를 준비해야한다
+# C2V 사용방법
+# C2V는 리눅스(Ubuntu) 컴퓨터를 기반으로 작동합니다.
+# 따라서 리눅스(Ubuntu) 컴퓨터를 준비해야합니다.
+# 본 코드는 ubuntu-22.04.3-live-server-arm64.iso 를 기준으로 개발되었습니다.
+#
 # 컴퓨터의 준비방법에는 크게 두가지가 있다
 # 1. 사용하는 개인용 컴퓨터에 가상의 리눅스를 설치
 # 2. 아마존웹서비스의 가상컴퓨터 사용
@@ -14,9 +16,6 @@ sudo sed -i 's/ports.ubuntu.com/ftp.kaist.ac.kr/g' /etc/apt/sources.list
 
 # 시스템 업데이트
 sudo apt update && sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -yq
-
-# 시스템 재시작
-# sudo reboot
 
 # 램 확장 (램이 부족하다면 선택적으로 수행)
 sudo swapoff -a
@@ -57,21 +56,23 @@ case "$SHELL" in
     ;;
 esac
 
-
-# 환경설정 - echo $SHELL; 명령어 수행결과 zsh라고 표시될때 수행
-# echo "export PUPPETEER_EXECUTABLE_PATH=$(which chromium)" >> ~/.zshrc && source ~/.zshrc
-
-# 프로젝트 생성
-# shorts_maker_dist.tar 파일 서버상에 위치시킨 후 npm i 실행.
-
-# 영상편집
-# example/ 폴더 내에 있는 html 파일을 수정하면 됨.
-
-# 실행
-# cd ~/canaanProject/shorts_maker && node index.js example/index.html output.mp4
+# OpenAI의 API키를 입력해주세요
+case "$SHELL" in
+  */zsh)
+    echo 'export OPENAI_API_KEY="sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"' >> ~/.zshrc && source ~/.zshrc
+    ;;
+  */bash)
+    echo 'export OPENAI_API_KEY="sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"' >> $(if [ -f ~/.bash_profile ]; then echo ~/.bash_profile; else echo ~/.bashrc; fi) && source $(if [ -f ~/.bash_profile ]; then echo ~/.bash_profile; else echo ~/.bashrc; fi)
+    ;;
+  *)
+    echo "not support"
+    ;;
+esac
 
 cd ~ && git clone https://github.com/kstost/c2v
 mv c2v canaanProject
 cd canaanProject/c2v/ && npm i
 echo "C2V is installed at `pwd`"
-echo "node index.js ./contents/ ./output.mp4"
+
+cp -R contents/.template contents/firstproject
+node seed_to_scenario.js -t firstproject -m ko -p "Pop Art style of"

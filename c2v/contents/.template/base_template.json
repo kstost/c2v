@@ -1,0 +1,21 @@
+{
+    "background_music": {
+        "filename": "",
+        "volume": 0
+    },
+    "default_appear_disappear": [
+        {
+            "opacity": 0,
+            "duration": 1
+        },
+        {
+            "scale": 1.5,
+            "duration": 0.4
+        }
+    ],
+    "timeline": [
+        {
+            "sleep_second": 0.1
+        }
+    ]
+}

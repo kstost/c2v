@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code to Video</title>
+    <style>
+        * {
+            font-family: "helvetica";
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgb(120, 0, 0);
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+
+<body>
+    <script type="module">
+        import { recordingStart, recordingEnd, main, playAudioScript, displayScreen, startBGM, delay } from '../.lib/lib.mjs';
+        main(async (stage, manifest, scenario, size, screenResources) => {
+            recordingStart()
+            startBGM()
+            let screenInst = { previousScreen: null, currentScreen: null };
+            for (const scene of scenario.timeline) {
+                if (scene.screen && scene.screen.constructor !== Array) scene.screen = [scene.screen];
+                if (scene.recording_end) {
+                    recordingEnd();
+                    break;
+                }
+                await playAudioScript(scene, screenInst);
+            }
+            recordingEnd();
+        })
+    </script>
+</body>
+
+</html>

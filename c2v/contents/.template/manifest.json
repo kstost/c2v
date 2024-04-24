@@ -1,0 +1,27 @@
+{
+    "background_color": "rgba(30,30,30,1)",
+    "screen_size": {
+        "width": 1920,
+        "height": 1080
+    },
+    "screen_scale": 1,
+    "merge": false,
+    "fonts": {
+        "KCC-Hanbit": "https://cdn.jsdelivr.net/gh/projectnoonnu/2403-2@1.0/KCC-Hanbit.woff2",
+        "NotoSansKR-Bold": "https://fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.woff2"
+    },
+    "subtitle": {
+        "fontSize": 70,
+        "padding": 10,
+        "margin": 30,
+        "bottom": 30,
+        "term": 7,
+        "color": "rgba(255,255,255,1)",
+        "background": "rgba(0,0,0,0.8)",
+        "fontFamily": "NotoSansKR-Bold",
+        "fontFamilys": {
+            "ko": "NotoSansKR-Bold"
+        },
+        "exclude": []
+    }
+}

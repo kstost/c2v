@@ -1,7 +1,13 @@
-const { spawn, exec } = require('child_process');
-const puppeteer = require('puppeteer');
-const path = require('path');
-const fs = require('fs');
+import { spawn, exec } from 'child_process';
+import puppeteer from 'puppeteer';
+import path from 'path';
+import fs from 'fs';
+import server from './server_body.js';
+import axios from 'axios';
+import getPort from 'get-port';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 async function findAvailableDisplay() {
     return new Promise((resolve, reject) => {
         exec("ps ax | grep Xvfb | grep -v grep", (err, stdout, stderr) => {
@@ -25,16 +31,12 @@ async function findAvailableDisplay() {
         });
     });
 }
-async function loadManifest(sourcePath) {
-    let manifest = fs.readFileSync(sourcePath + '/manifest.json', 'utf8');
-    try {
-        return JSON.parse(manifest);
-    } catch (error) { }
-    return;
-}
 (async () => {
-    const sourcePath = path.resolve(process.argv[2]);
-    const manifest = await loadManifest(sourcePath);
+    const portnum = await getPort({ port: 3262 });
+    let sp = server(portnum)
+    let templateName = process.argv[2];
+    let url = `http://localhost:${portnum}/page/${templateName}/`;
+    const manifest = (await axios.get(`${url}manifest.json`)).data;
     let merge = manifest.merge;
     let resolution = manifest.screen_size;
     resolution.width = Math.round(resolution.width * manifest.screen_scale);
@@ -49,13 +51,15 @@ async function loadManifest(sourcePath) {
             ignoreDefaultArgs: ['--enable-automation'],
             args: ['--no-sandbox', '--disable-setuid-sandbox', `--display=${display}`, '--window-size=' + `${resolution.width},${resolution.height}`,
                 '--autoplay-policy=no-user-gesture-required',
+                '--window-position=0,0',
+                '--font-render-hinting=medium',
             ],
             defaultViewport: resolution
         });
         const page = await browser.newPage();
-        await page.goto(`file://${sourcePath}/${manifest.main}#puppeteer`);
+        await page.goto(`${url}#puppeteer`);
         let firstWithAudio = i === 0;
-        await page.waitForFunction(() => document.readyState === 'complete', { polling: 'raf' });
+        await page.waitForFunction(() => document.readyState === 'complete', { polling: 'raf', timeout: 0 });
         await page.evaluate(() => {
             const audio = document.createElement('audio');
             audio.id = 'myAudio';
@@ -69,7 +73,7 @@ async function loadManifest(sourcePath) {
         });
 
         await page.evaluate(() => document.documentElement.requestFullscreen());
-        await page.waitForFunction(() => window.readyd === true, { polling: 'raf' });
+        await page.waitForFunction(() => window.readyd === true, { polling: 'raf', timeout: 0 });
         let soundOption = [];
         if (!merge || (merge && firstWithAudio)) soundOption = ['-f', 'alsa', '-i', 'default',]; // pulse
         const outputPath = `${path.resolve(process.argv[3])}`;
@@ -92,7 +96,7 @@ async function loadManifest(sourcePath) {
             '-y', outputPath
         ]);
 
-        await page.waitForFunction(() => window.doned === true, { polling: 'raf' });
+        await page.waitForFunction(() => window.doned === true, { polling: 'raf', timeout: 0 });
         if (merge) {
             ffmpeg.on('close', async (code) => {
                 await browser.close();
@@ -109,9 +113,10 @@ async function loadManifest(sourcePath) {
                         '-shortest',                 // 짧은 길이를 기준으로 출력 파일 생성
                         '-y', `${outputPath}`        // 결과 파일 이름
                     ]);
-                    ffmpeg.on('close', (code) => {
+                    ffmpeg.on('close', async (code) => {
                         fs.unlinkSync(`${outputPath}_video`);
                         fs.unlinkSync(`${outputPath}_audio`);
+                        await new Promise(rr => sp.close(() => rr(null)));
                         console.log(`Video file has been generated at: ${outputPath}`);
                     });
                 } else {
@@ -123,6 +128,7 @@ async function loadManifest(sourcePath) {
             ffmpeg.on('close', async (code) => {
                 await browser.close();
                 xvfb.kill();
+                await new Promise(rr => sp.close(() => rr(null)));
                 console.log(`Video file has been generated at: ${outputPath}`);
             });
             ffmpeg.kill('SIGINT')
